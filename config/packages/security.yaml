@@ -55,6 +55,8 @@ security:
     access_control:
         # Les routes classiques de login et logout sont maintenant accessibles sans restriction de rôle
         - { path: ^/api/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/select, roles: ROLE_USER }
+
         
         # Autres routes protégées par rôle
         - { path: ^/api/projects, roles: ROLE_ADMIN }

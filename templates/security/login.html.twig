@@ -32,41 +32,61 @@
         <button class="btn btn-lg btn-primary" type="submit">Sign in</button>
     </form>
 
+    
     <script>
-        document.getElementById('login-form').addEventListener('submit', async function(event) {
-            event.preventDefault(); // Empêche la soumission du formulaire classique
+      document.getElementById('login-form').addEventListener('submit', async function(event) {
+    event.preventDefault(); // Empêcher la soumission classique du formulaire
 
-            const email = document.getElementById('inputEmail').value;
-            const password = document.getElementById('inputPassword').value;
-            const csrfToken = document.querySelector('input[name="_csrf_token"]').value;
+    const email = document.getElementById('inputEmail').value;
+    const password = document.getElementById('inputPassword').value;
+    const csrfToken = document.querySelector('input[name="_csrf_token"]').value;
 
-            try {
-                const response = await fetch('/api/login', { // Ton API de connexion
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        email: email,
-                        password: password,
-                        _csrf_token: csrfToken
-                    })
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Invalid credentials');
-                }
-
-                const data = await response.json();
-                // Si la connexion est réussie, on récupère le token et on le stocke dans localStorage
-                localStorage.setItem('jwt_token', data.token);
-
-                // Optionnel : rediriger l'utilisateur vers une autre page
-                window.location.href = '/dashboard'; // Par exemple, redirige l'utilisateur vers le dashboard
-            } catch (error) {
-                alert('Erreur: ' + error.message);
-            }
+    try {
+        // Connexion via l'API pour récupérer le token JWT
+        const response = await fetch('/api/login', { 
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: email,
+                password: password,
+                _csrf_token: csrfToken
+            })
         });
-    </script>
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Identifiants invalides');
+        }
+
+        const data = await response.json();
+        const token = data.token; // Le token JWT retourné par l'API
+        localStorage.setItem('jwt_token', token);  // On stocke le token dans le localStorage
+
+        fetch('/api/select', {
+    method: 'GET',
+    headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('jwt_token')
+    }
+})
+.then(response => response.json())
+.then(data => {
+    console.log(data);
+    // Traiter les données de la société ici
+})
+.catch(error => {
+    console.error('Erreur:', error);
+});
+
+        
+
+    } catch (error) {
+        alert('Erreur : ' + error.message);
+    }
+});
+
+        </script>
+        
+    
 {% endblock %}
