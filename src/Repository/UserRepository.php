@@ -32,4 +32,29 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->persist($user);
         $this->getEntityManager()->flush();
     }
+
+    public function findUserRoleInCompany(User $user, Company $company)
+    {
+       
+        $roles = [];
+
+        
+        $association = $this->createQueryBuilder('u')
+            ->innerJoin('u.companies', 'c')
+            ->addSelect('c')
+            ->where('u.id = :userId')
+            ->andWhere('c.id = :companyId')
+            ->setParameter('userId', $user->getId())
+            ->setParameter('companyId', $company->getId())
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        if ($association) {
+            
+            $roles[] = $association->getRole(); 
+        }
+
+        return $roles;
+    }
+
 }

@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Page d'Accueil{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1>Bienvenue sur notre application!</h1>
+        <p>Ceci est une page d'accueil où vous pouvez vous connecter pour accéder à vos projets et sociétés.</p>
+        
+        <a href="{{ path('app_login') }}" class="btn btn-primary">Se connecter</a>
+    </div>
+{% endblock %}
