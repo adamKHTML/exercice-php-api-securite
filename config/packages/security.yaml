@@ -14,25 +14,12 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
-        # Firewall pour les routes classiques (web)
+        # Firewall pour les routes classiques (web) - Aucune authentification via formulaire ici
         main:
-            # Permet la gestion de la session pour les routes classiques comme /login
-            pattern: ^/(?!api)
-            # Authentification pour les utilisateurs via un formulaire classique
-            form_login:
-                login_path: app_login      # La route pour la page de connexion
-                check_path: app_login_check  # La route pour la soumission du formulaire
-                default_target_path: app_dashboard  # Redirection après une connexion réussie
-                always_use_default_target_path: true
-            logout:
-                path: app_logout  # La route pour la déconnexion classique
-                # Rediriger l'utilisateur vers la page d'accueil après la déconnexion
-                target: /  # La page d'accueil après la déconnexion
-            # Active la session pour la gestion des utilisateurs
-            # Permet de gérer les utilisateurs authentifiés dans la session
+            pattern: ^/(?!api)  # Exclure l'API de ce firewall
             security: true
 
-        # Firewall pour l'API
+        # Firewall pour l'API avec JWT
         api:
             pattern: ^/api/
             stateless: true
@@ -45,7 +32,7 @@ security:
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
             jwt: ~
-            custom_authenticator: App\Security\AppCustomAuthenticator
+            # custom_authenticator: App\Security\AppCustomAuthenticator
             logout:
                 path: /api/logout
                 target: /api/login
@@ -53,12 +40,8 @@ security:
 
     # Contrôle d'accès (access_control) : gestion des autorisations sur les différentes routes API
     access_control:
-        # Les routes classiques de login et logout sont maintenant accessibles sans restriction de rôle
         - { path: ^/api/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api/select, roles: ROLE_USER }
-
-        
-        # Autres routes protégées par rôle
         - { path: ^/api/projects, roles: ROLE_ADMIN }
         - { path: ^/api/projects/create, roles: [ROLE_ADMIN, ROLE_MANAGER] }
         - { path: ^/api/projects/edit, roles: [ROLE_ADMIN, ROLE_MANAGER] }

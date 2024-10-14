@@ -7,3 +7,8 @@ controllers:
 auth:
     path: /api/auth
     methods: ['POST']
+    
+login:
+  path: /api/login
+  controller: App\Controller\LoginController::login
+  methods: [POST]
