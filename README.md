@@ -17,3 +17,7 @@ Pour installer et lancer le projet :
 3. Configurez vos variables d'environnement.
 4. Lancez l'application en local.
 
+N.B : Voici deux utilisateurs que vous pouvez essayer -> 
+- user1@local.host
+-  user2@local.host
+  Mot de passe : my_password 
