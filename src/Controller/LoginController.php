@@ -14,7 +14,7 @@ class LoginController extends AbstractController
     private $jwtManager;
     private $entityManager;
 
-    // Le constructeur pour injecter le JWTManager et l'EntityManager
+    
     public function __construct(
         JWTTokenManagerInterface $jwtManager,
         EntityManagerInterface $entityManager
@@ -24,32 +24,59 @@ class LoginController extends AbstractController
         $this->entityManager = $entityManager;
     }
 
-    // Définition de la route pour l'API de login
+   
     #[Route(path: '/api/login', methods: ['POST'])]
     public function apiLogin(Request $request): JsonResponse
     {
-        // Récupérer les données de la requête
+        
         $data = json_decode($request->getContent(), true);
         $email = $data['email'] ?? null;
         $password = $data['password'] ?? null;
 
-        // Vérifier si l'email et le mot de passe ont été fournis
+      
         if (!$email || !$password) {
             return new JsonResponse(['error' => 'Email et mot de passe sont requis'], 400);
         }
 
-        // Rechercher l'utilisateur par son email dans la base de données
+      
         $user = $this->entityManager->getRepository(User::class)->findOneByEmail($email);
         
-        // Si l'utilisateur n'existe pas ou si le mot de passe est incorrect
+        
         if (!$user || !password_verify($password, $user->getPassword())) {
             return new JsonResponse(['error' => 'Identifiants invalides'], 401);
         }
 
-        // Générer un token JWT pour l'utilisateur
+      
         $token = $this->jwtManager->create($user);
 
-        // Retourner le token dans la réponse
+      
         return new JsonResponse(['token' => $token]);
     }
+
+    #[Route('/api/logoff', name: 'api_logoff', methods: ['POST'])]
+    public function logout(Request $request): JsonResponse
+    {
+        $user = $this->getUser();
+    
+       
+        if (!$user) {
+            return new JsonResponse(['message' => 'Utilisateur non connecté'], 401); 
+        }
+    
+      
+        $roles = $user->getRoles();
+    
+        
+        $filteredRoles = array_filter($roles, function ($role) {
+            return $role === 'ROLE_USER';
+        });
+    
+        $user->setRoles(array_values($filteredRoles));
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+    
+      
+        return new JsonResponse(['message' => 'Déconnexion réussie'], 200);
+    }
+    
 }

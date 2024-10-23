@@ -6,17 +6,16 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\ProjectRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-
 /**
  * @ApiResource(
  *     collectionOperations={
  *         "get"={"security"="is_granted('ROLE_USER')"},
- *         "post"={"security"="is_granted('ROLE_MANAGER')"}
+ *         "post"={"security"="is_granted('ROLE_MANAGER') or is_granted('ROLE_ADMIN')"}
  *     },
  *     itemOperations={
  *         "get"={"security"="is_granted('ROLE_USER')"},
- *         "put"={"security"="is_granted('ROLE_MANAGER')"},
- *         "delete"={"security"="is_granted('ROLE_ADMIN')"}
+ *         "put"={"security"="is_granted('ROLE_MANAGER') or is_granted('ROLE_ADMIN')"},
+ *         "delete"={"security"="is_granted('ROLE_MANAGER') or is_granted('ROLE_ADMIN')"}
  *     }
  * )
  */

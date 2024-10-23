@@ -2,7 +2,6 @@
 
 namespace App\Security\Voter;
 
-use App\Entity\Project;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -21,62 +20,45 @@ class ProjectVoter extends Voter
         $this->entityManager = $entityManager;
     }
 
-    protected function supports(string $attribute, $subject): bool
+    protected function supports($attribute, $subject): bool
     {
-        return in_array($attribute, [self::PROJECT_CREATE, self::PROJECT_EDIT, self::PROJECT_DELETE])
-            && $subject instanceof Project;
+        return in_array($attribute, [self::PROJECT_CREATE, self::PROJECT_EDIT, self::PROJECT_DELETE]);
     }
 
-    protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token): bool
+    protected function voteOnAttribute($attribute, $subject, TokenInterface $token): bool
     {
         $user = $token->getUser();
         if (!$user instanceof User) {
-            // L'utilisateur n'est pas authentifié
             return false;
         }
 
-        /** @var Project $project */
-        $project = $subject;
-
-        // Récupération du rôle de l'utilisateur dans la société associée au projet
-        $userCompanyRole = $this->getUserRoleInCompany($user, $project);
-
         switch ($attribute) {
             case self::PROJECT_CREATE:
-                return $this->canCreate($userCompanyRole);
+                return $this->canCreate($user);
             case self::PROJECT_EDIT:
-                return $this->canEdit($userCompanyRole);
+                return $this->canEdit($user, $subject);
             case self::PROJECT_DELETE:
-                return $this->canDelete($userCompanyRole);
+                return $this->canDelete($user, $subject);
         }
 
         return false;
     }
 
-    private function canCreate(?string $userCompanyRole): bool
+    private function canCreate(User $user): bool
     {
         // Seuls les admins ou managers peuvent créer des projets
-        return in_array($userCompanyRole, ['ROLE_ADMIN', 'ROLE_MANAGER']);
+        return in_array('ROLE_ADMIN', $user->getRoles()) || in_array('ROLE_MANAGER', $user->getRoles());
     }
 
-    private function canEdit(?string $userCompanyRole): bool
+    private function canEdit(User $user, $project): bool
     {
-        // Seuls les admins ou managers peuvent modifier un projet
-        return in_array($userCompanyRole, ['ROLE_ADMIN', 'ROLE_MANAGER']);
+       // Seuls les admins ou managers peuvent modifier des projets
+        return in_array('ROLE_ADMIN', $user->getRoles()) || in_array('ROLE_MANAGER', $user->getRoles());
     }
 
-    private function canDelete(?string $userCompanyRole): bool
+    private function canDelete(User $user, $project): bool
     {
-        // Seuls les admins peuvent supprimer des projets
-        return $userCompanyRole === 'ROLE_ADMIN';
-    }
-
-    private function getUserRoleInCompany(User $user, Project $project): ?string
-    {
-        // Récupérer la société associée au projet
-        $company = $project->getCompany();
-
-        // Retourner le rôle de l'utilisateur dans la société
-        return $this->entityManager->getRepository(User::class)->findUserRoleInCompany($user, $company);
+        // Seuls les admins ou managers peuvent supprimer des projets
+        return in_array('ROLE_ADMIN', $user->getRoles()) || in_array('ROLE_MANAGER', $user->getRoles());
     }
 }

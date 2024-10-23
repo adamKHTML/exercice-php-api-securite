@@ -26,7 +26,7 @@ final class CompanyController extends AbstractController
     #[Route('/new', name: 'app_company_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
-        // Vérification du droit de création de société
+       
         $this->denyAccessUnlessGranted('company_create');
 
         $company = new Company();
@@ -49,7 +49,7 @@ final class CompanyController extends AbstractController
     #[Route('/{id}', name: 'app_company_show', methods: ['GET'])]
     public function show(Company $company): Response
     {
-        // Vérification de l'accès à la société (consultation)
+       
         $this->denyAccessUnlessGranted('company_view', $company);
 
         return $this->render('company/show.html.twig', [
@@ -60,7 +60,7 @@ final class CompanyController extends AbstractController
     #[Route('/{id}/edit', name: 'app_company_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Company $company, EntityManagerInterface $entityManager): Response
     {
-        // Vérification du droit d'édition de la société
+       
         $this->denyAccessUnlessGranted('company_edit', $company);
 
         $form = $this->createForm(CompanyType::class, $company);
@@ -81,7 +81,7 @@ final class CompanyController extends AbstractController
     #[Route('/{id}', name: 'app_company_delete', methods: ['POST'])]
     public function delete(Request $request, Company $company, EntityManagerInterface $entityManager): Response
     {
-        // Vérification du droit de suppression de la société
+        
         $this->denyAccessUnlessGranted('company_delete', $company);
 
         if ($this->isCsrfTokenValid('delete' . $company->getId(), $request->request->get('_token'))) {

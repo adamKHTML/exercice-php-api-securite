@@ -4,6 +4,7 @@ namespace App\DataFixtures;
 
 use App\Entity\User;
 use App\Entity\Company;
+use App\Factory\UserFactory;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 
@@ -11,7 +12,10 @@ class AppFixtures extends Fixture
 {
     public function load(ObjectManager $manager)
     {
-        // Création des sociétés
+        UserFactory::createOne(['email' => 'user1@local.host']);
+        UserFactory::createOne(['email' => 'user2@local.host']);
+        UserFactory::createMany(10);
+
         $company1 = new Company();
         $company1->setName('TechVision SARL')
                  ->setSiret('123 456 789 00012')
@@ -42,7 +46,6 @@ class AppFixtures extends Fixture
                  ->setAddress('78 Quai du Rhône, Lyon');
         $manager->persist($company5);
 
-        // Création des utilisateurs (pas besoin de mot de passe, nous avons juste l'email)
         $users = [
             ['user1@local.host', ['admin', 'manager']],
             ['user2@local.host', ['manager', 'consultant']],
@@ -58,15 +61,13 @@ class AppFixtures extends Fixture
             ['taya05@bahringer.com', ['manager', 'admin']],
         ];
 
-        // Associer les utilisateurs aux sociétés avec les rôles appropriés
         foreach ($users as $userData) {
             $user = new User();
             $user->setEmail($userData[0])
-                 ->setPassword('$2y$13$j4TIcq7tBOt0e4/s0DtCBOsAfXyo4Rq7oADHbNwxgc2JYgy.yWvSu'); 
+                 ->setPassword('$2y$13$j4TIcq7tBOt0e4/s0DtCBOsAfXyo4Rq7oADHbNwxgc2JYgy.yWvSu');
             
             $manager->persist($user);
 
-            // Assignation des rôles
             foreach ($userData[1] as $role) {
                 if ($role == 'admin') {
                     $user->addCompany($company1);  
@@ -78,7 +79,6 @@ class AppFixtures extends Fixture
             }
         }
 
-        // Sauvegarder les entités dans la base de données
         $manager->flush();
     }
 }

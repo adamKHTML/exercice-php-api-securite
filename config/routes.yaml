@@ -7,8 +7,18 @@ controllers:
 auth:
     path: /api/auth
     methods: ['POST']
-    
+
 login:
   path: /api/login
   controller: App\Controller\LoginController::login
+  methods: [POST]
+
+assign_role:
+    path: /api/assign-role
+    controller: App\Controller\SelectCompanyController::assignRole
+    methods: ['POST']
+
+logoff:
+  path: /api/logoff
+  controller: App\Controller\LoginController::logout
   methods: [POST]

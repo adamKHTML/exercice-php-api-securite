@@ -14,9 +14,9 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
-        # Firewall pour les routes classiques (web) - Aucune authentification via formulaire ici
+        # Firewall pour les routes classiques (web) 
         main:
-            pattern: ^/(?!api)  # Exclure l'API de ce firewall
+            pattern: ^/(?!api) 
             security: true
 
         # Firewall pour l'API avec JWT
@@ -32,18 +32,16 @@ security:
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
             jwt: ~
-            # custom_authenticator: App\Security\AppCustomAuthenticator
-            logout:
-                path: /api/logout
-                target: /api/login
-                invalidate_session: false
+            
 
     # Contrôle d'accès (access_control) : gestion des autorisations sur les différentes routes API
     access_control:
-        - { path: ^/api/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/api/select, roles: ROLE_USER }
-        - { path: ^/api/projects, roles: ROLE_ADMIN }
-        - { path: ^/api/projects/create, roles: [ROLE_ADMIN, ROLE_MANAGER] }
-        - { path: ^/api/projects/edit, roles: [ROLE_ADMIN, ROLE_MANAGER] }
-        - { path: ^/api/projects/delete, roles: [ROLE_ADMIN, ROLE_MANAGER] }
-        - { path: ^/api/users, roles: ROLE_ADMIN }
+    - { path: ^/api/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+    - { path: ^/api/logoff, roles: ROLE_USER }
+    - { path: ^/api/select, roles: ROLE_USER }
+    - { path: ^/api/assign-role, roles: ROLE_USER } 
+    - { path: ^/api/projects, roles: ROLE_USER }
+    - { path: ^/api/projects/create, roles: [ROLE_ADMIN, ROLE_MANAGER] } 
+    - { path: ^/api/projects/edit, roles: [ROLE_ADMIN, ROLE_MANAGER] }  
+    - { path: ^/api/projects/delete, roles: [ROLE_ADMIN, ROLE_MANAGER] }
+    - { path: ^/api/users, roles: ROLE_ADMIN }
